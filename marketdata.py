@@ -1,18 +1,19 @@
+# Step 2
+
 import json, requests, sqlite3
 import pandas as pd
 
 headers = json.loads(open('Alpaca_Key.txt','r').read())
-data_url = 'https://data.alpaca.markets/v2/stocks/bars/1Min?symbols='
+data_url = 'https://paper-api.alpaca.markets/v2/stocks/bars/1Hour?symbols='
 
 #Specify the tickers
 tickers = ['AAPL','AMZN','FB','GOOG','NFLX']
 symbols = ",".join(tickers)
 print(f'{data_url}{symbols}')
 r = requests.get(f'{data_url}{symbols}', headers=headers, verify=False)
-print(r.content)
+print('r.content: ', r.content)
 
-#data = r.json()
-#print(data)
+data = r.json()
 
 #Establish database connection
 db = sqlite3.connect("minutes.db")
