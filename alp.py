@@ -1,10 +1,12 @@
 # Step 1
-# Import alpaca trade API
+# Import alpaca trade API, play with functions
+import datetime
 
 import ssl_patch
 import json
 import alpaca_trade_api as tradeapi
 import pandas as pd
+from datetime import timedelta
 
 headers = json.loads(open('Alpaca_Key.txt','r').read())
 
@@ -17,7 +19,14 @@ with ssl_patch.no_ssl_verification():
     symbols=['AAPL','AMZN','FB','GOOG','NFLX']
 
     #Get historical data
-    barsets = api.get_bars(symbols,'1D').df
+    delta = datetime.timedelta(days=5)
+    end = datetime.datetime.fromtimestamp(api.get_clock().next_close.timestamp())
+    start = end-delta
+    print(start.isoformat())
+
+    #barsets = api.get_bars(symbols,'1D', start=start.isoformat(), end=end.isoformat()).df
+    barsets = api.get_bars(symbols, '1D').df
+
     barsets.to_csv('alpaca_bars.csv')
 
     #Get account status

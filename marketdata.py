@@ -8,7 +8,7 @@ import alpaca_trade_api as tradeapi
 headers = json.loads(open('Alpaca_Req.txt','r').read())
 data_url = 'https://data.alpaca.markets/v2/stocks/bars/1Hour?symbols='
 
-#Specify the tickers
+# Specify the tickers
 tickers = ['AAPL','AMZN','FB','GOOG','NFLX']
 symbols = ",".join(tickers)
 
@@ -20,7 +20,7 @@ symbols = ",".join(tickers)
 #Create empty dataframe
 hist_df = pd.DataFrame()
 
-#Try alternative approach to collect historical data
+# Try alternative approach to collect historical data, as code above doesn't work for me (7/15/22)
 with ssl_patch.no_ssl_verification():
     api = tradeapi.REST(key_id=headers['APCA-API-KEY-ID'],
                             secret_key=headers['APCA-API-SECRET-KEY'],
@@ -35,10 +35,10 @@ hist_df['timestamp'] = pd.DatetimeIndex(pd.to_datetime(hist_df.index, unit='s',)
 print(hist_df.info())
 hist_df.to_csv('alpaca_multibars.csv')
 
-#Establish database connection
+# Establish database connection
 db = sqlite3.connect("minutes.db")
 
-#Define a create table function
+# Define a create table function
 def create_table(symbols):
     cursor = db.cursor()
     for symbol in symbols:
@@ -48,14 +48,14 @@ def create_table(symbols):
         except:
             db.rollback()
 
-#Create a table for each stock
+# Create a table for each stock
 create_table([ticker for ticker in tickers]) #list comprehension
 
-#Load data into tables
+# Load data into tables
 hist_df.to_sql(name='hist_data_min', con=db, if_exists='append', index=False)
 db.commit()
 
-#Check database data - write to file
+# Check database data - write to file
 from_db = pd.read_sql(con=db,sql='SELECT * FROM hist_data_min')
 from_db.to_csv("from_db.csv")
 
